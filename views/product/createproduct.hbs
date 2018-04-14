@@ -1,0 +1,38 @@
+<div class="row centered">
+ <div class="col-md-4 col-md-offset-4">
+   <h1>Insert</h1>
+   <form action="/product/add" method="post" enctype="multipart/form-data">
+     <div class="form-group">
+       <label for="name">Product Name</label>
+       <input type="text" id="name" name="name" class="form-control">
+     </div>
+     <div class="form-group">
+       <label for="description">Description</label>
+       <input type="text" id="description" name="description" class="form-control">
+     </div>
+     <div class="form-group">
+       <label for="category">Category</label>
+       <input type="text" id="category" name="category" class="form-control">
+     </div>
+     <div class="form-group">
+       <label for="text">Timer</label>
+       <!-- for="time" -->
+       <input type="timer" id="timer" name="timer" class="form-control">
+     </div>
+     <div class="form-group">
+       <label for="amount">Amount</label>
+       <input type="number" id="amount" name="amount" class="form-control">
+     </div>
+     <div class="form-group">
+       <label for="image">Image</label>
+       <input type="file" accept="image/*" id="image" name="image" class="form-control">
+     </div>
+     <div class="form-group">
+       <label for="amount">Seller</label>
+       <input type="text" id="seller" name="seller" class="form-control">
+     </div>
+     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+     <button type="submit" class="btn btn-primary">Auction item</button>
+   </form>
+ </div>
+</div>

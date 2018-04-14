@@ -1,0 +1,8 @@
+ .thumbnail img {
+ 	height: 250px;
+ 	width: 300px;
+ }
+
+ .thumbnail .description {
+ 	 color: #808080;
+ }

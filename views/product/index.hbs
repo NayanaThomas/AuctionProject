@@ -1,0 +1,36 @@
+<table class="table table-hover">
+  <thead>
+   <tr>
+     <th scope="col">image</th>
+     <th scope="col">details</th>
+   </tr>
+ </thead>
+ {{# each products }}
+ {{# each this}}
+ <tr>
+   <!-- <th scope="row">1</th> -->
+   <td class="thumbnail"><img src="{{this.image}}" alt="Product image" class ="img-responsive thumbnail"></td>
+   <td>
+     <ul class="list-unstyled">
+       <li class="font-weight-bold">{{ this.name }}</li>
+       <li>Category: {{ this.category }}</li>
+       <li>Description: {{ this.description }}</li>
+       <li>Timer: {{ this.timer }}</li>
+       <li>Minimum Bid: {{ this.amount }}</li>
+       <li>Seller: {{ this.seller }}</li>
+       <!-- <li>Buyer: {{this.buyer}} </li> -->
+     </ul>
+   </td>
+   <td>
+		 <form action="/bid/{{this._id}}" method="post">
+       <button  id="bid" type="submit" style="margin-bottom: 0.5em" class="btn btn-primary">Bid</button>
+     </form>
+
+     <form  action="/favourites/{{this._id}}" method="get">
+       <button id="fav" type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i></button>
+     </form>
+    </td>
+ </tr>
+ {{/each}}
+ {{/each}}
+</table>
