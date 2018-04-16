@@ -3,12 +3,13 @@ var router = express.Router();
 var csrf = require('csurf');
 var passport = require('passport');
 var monk = require('monk');
-// var angular = require('angular');
+var bodyParser = require('body-parser');
 var csrfProtection = csrf();
 router.use(csrfProtection);
 var url = require('url');
 
 var db = monk('localhost:27017/auction');
+router.use(bodyParser.urlencoded({ extended: true }));
 
 // defining the route
 router.get('/profile', isLoggedIn, function(req, res, next){
@@ -27,10 +28,21 @@ router.get('/favourites/:id',  isLoggedIn, function(req, res, next) {
 
 router.get('/userAuctionItems',  isLoggedIn, function(req, res, next) {
 	var collection = db.get('products');
-	collection.find({ seller: req.session.passport.user }, function(err, products){
-			if (err) throw err;
-		res.render('user/userAuctionItems', {products: products});
-	});
+	var usercollection = db.get('users');
+	console.log("aution");
+	console.log(req.session.passport.user);
+usercollection.findOne({_id: req.session.passport.user}, 'email', function(err, result){
+	if (err) {
+		console.log(err);
+	}
+	console.log(result.email);
+	collection.find({seller: result.email }, function(err, prod){
+				if (err) throw err;
+				console.log("product");
+				console.log(prod);
+				res.render('user/userAuctionItems', {products: prod});
+		});
+});
 });
 
 router.get('/logout', isLoggedIn, function(req, res, next) {

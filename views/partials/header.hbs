@@ -36,10 +36,10 @@
       </li>
 
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Product Name" aria-label="Search">
+    <form class="form-inline my-2 my-lg-0" action="product/search" method="post">
+      <input class="form-control mr-sm-2" id="productname" name="productname" type="search" placeholder="Product Name" aria-label="Search">
       <div class="form-group">
-          <select class="form-control" id="sel1" placeholder="Categories">
+          <select class="form-control" id="sel1" name="sel1" placeholder="Categories">
           <option value="" selected disabled>Categories</option>
           </select>
       </div>

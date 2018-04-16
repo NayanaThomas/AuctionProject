@@ -8,7 +8,7 @@ var Products   = require('../models/product');
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+/*router.get('/', function(req, res, next) {
 	Products.find(function(err, docs) {
 		var productsChunks = [];
 		var chunkSize = 7;
@@ -17,7 +17,19 @@ router.get('/', function(req, res, next) {
 		}
 		res.render('product/index', { title: 'Online Auction',products: productsChunks});
 	});
-}); 
+}); */
+
+router.get('/', function(req, res, next) {
+	var collection = db.get('products');
+	collection.find({},function(err, products){
+			if (err) {
+				console.log(err);
+			}
+			console.log(products);
+			res.render('product/index', {products: products});
+		});
+
+});
 
 router.get('/favourites/:id',  function(req, res, next){
 	var prodCollection = db.get('products');

@@ -57,15 +57,48 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 
 router.post('/add', multer(multerConf).single('image'),function(req, res, next) {
-    req.body.image = "/images/"+req.file.filename;
-    var myData = new Product(req.body);
-    myData.save(function(err) {
+    var usercollection = db.get('users');
+    console.log("aution");
+    console.log(req.session.passport.user);
+    usercollection.findOne({_id: req.session.passport.user}, 'email', function(err, result){
         if (err) {
-            res.redirect(backURL);
+            console.log(err);
         }
-        res.redirect('/');
+        console.log(result.email);
+        req.body.image = "/images/"+req.file.filename;
+        req.body.seller = result.email;
+        var myData = new Product(req.body);
+         myData.save(function(err) {
+            if (err) {
+                res.redirect(backURL);
+            }
+            res.redirect('/');
+        });
     });
+});
 
+router.post('/search', function(req,res,next) {
+    console.log(req.body);
+    var collection = db.get('products');
+    if(req.body.productname == '') {
+        collection.find({},function(err, products){
+            if (err) {
+                console.log(err);
+            }
+            console.log(products);
+            res.render('product/index', {products: products});
+        });
+    }
+
+    else{
+    collection.find({name: req.body.productname }, function(err, prod){
+                if (err) throw err;
+                console.log("product");
+                console.log(prod);
+                res.render('product/index', {products: prod});
+        });
+    
+    }
 });
 
 function isLoggedIn(req, res, next) {

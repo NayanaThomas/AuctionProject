@@ -6,9 +6,11 @@
    </tr>
  </thead>
  {{# each products }}
+
 <tr>
     <!-- <th scope="row">1</th> -->
-   <td>image</td>
+    <td class="thumbnail"><img src="{{this.image}}" alt="Product image" class ="img-responsive thumbnail"></td>
+    <td>
    <td>
      <ul class="list-unstyled">
        <li class="font-weight-bold">{{ this.name }}</li>
@@ -21,5 +23,6 @@
      </ul>
    </td>
 </tr>
+
  {{/each}}
 </table>
