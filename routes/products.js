@@ -46,7 +46,7 @@ var multerConf = {
 var monk = require('monk');
 var db = monk('localhost:27017/auction');
 
-router.get('/createproduct', isLoggedIn, function(req, res, next) {
+router.get('/createproduct', function(req, res, next) {
 	res.render('product/createproduct');
 });
 

@@ -12,7 +12,7 @@ var db = monk('localhost:27017/auction');
 router.use(bodyParser.urlencoded({ extended: true }));
 
 // defining the route
-router.get('/profile', isLoggedIn, function(req, res, next){
+router.get('/profile', function(req, res, next){
 	res.render('user/profile');
 });
 
@@ -50,7 +50,7 @@ router.get('/logout', isLoggedIn, function(req, res, next) {
 	res.redirect('/');
 });
 
-router.use('/', isnotLoggedIn, function(req, res, next) {
+router.use('/', function(req, res, next) {
 	next();
 });
 
