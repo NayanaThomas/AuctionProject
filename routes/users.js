@@ -12,18 +12,35 @@ var db = monk('localhost:27017/auction');
 router.use(bodyParser.urlencoded({ extended: true }));
 
 // defining the route
-router.get('/profile', function(req, res, next){
+router.get('/profile', isLoggedIn, function(req, res, next){
 	res.render('user/profile');
 });
 
-router.get('/favourites/:id',  isLoggedIn, function(req, res, next) {
+router.get('/bid/:id', function (req, res) {
+    var prodCollection = db.get('products');
+    prodCollection.findOne({ _id: req.params.id }, function (err, products) {
+        if (err) console.log(err);
+        res.render('user/bid', { products: products});
+    });
+    
+});
+
+router.get('/favourites_page',  isLoggedIn, function(req, res, next) {
 	var userCollection = db.get('users');
-	// var prodCollection = db.get('products');
-	userCollection.update({ seller: 'tes.test@gmail.com' },'favourites' , function(err, productIds){
-			if (err) throw err;
-			// res.send(productIds);
-			res.render('user/favourites', {products: productIds});
-	});
+	var favCollection = db.get('favourites');
+    userCollection.findOne({ _id: req.session.passport.user }, 'email', function (err, result) {
+        if (err) {
+            console.log(err);
+        }
+        console.log(result.email);
+        favCollection.find({ user: result.email }, function (err, products) {
+            if (err) console.log(err);
+            console.log('fav page');
+            console.log(products);
+            res.render('user/favourites', { products: products });
+        });
+        
+    });
 });
 
 router.get('/userAuctionItems',  isLoggedIn, function(req, res, next) {
@@ -50,7 +67,7 @@ router.get('/logout', isLoggedIn, function(req, res, next) {
 	res.redirect('/');
 });
 
-router.use('/', function(req, res, next) {
+router.use('/', isnotLoggedIn, function(req, res, next) {
 	next();
 });
 
@@ -71,7 +88,7 @@ router.get('/signin', function(req, res, next) {
 
 });
 router.post('/signin', passport.authenticate('local.signin', {
-	successRedirect: '/user/profile',
+	successRedirect: '/',
 	failureRedirect: '/user/signin',
 	failureFlash: true
 }));

@@ -10,6 +10,7 @@ var multer = require('multer');
 var url = 'mongodb://localhost:27017/auction';
 mongoose.connect('mongodb://localhost:27017/auction');
 
+
 var multerConf = {
     storage : multer.diskStorage({
     destination: function(req, file, next) {
@@ -46,7 +47,7 @@ var multerConf = {
 var monk = require('monk');
 var db = monk('localhost:27017/auction');
 
-router.get('/createproduct', function(req, res, next) {
+router.get('/createproduct', isLoggedIn, function(req, res, next) {
 	res.render('product/createproduct');
 });
 
@@ -77,10 +78,10 @@ router.post('/add', multer(multerConf).single('image'),function(req, res, next) 
     });
 });
 
-router.post('/search', function(req,res,next) {
+router.post('/search', isLoggedIn, function(req,res,next) {
     console.log(req.body);
     var collection = db.get('products');
-    if(req.body.productname == '') {
+    if(req.body.productname == '' && req.body.sel1 == 'All Categories') {
         collection.find({},function(err, products){
             if (err) {
                 console.log(err);
@@ -89,9 +90,25 @@ router.post('/search', function(req,res,next) {
             res.render('product/index', {products: products});
         });
     }
-
-    else{
-    collection.find({name: req.body.productname }, function(err, prod){
+    else if(req.body.productname != '' && req.body.sel1 == 'All Categories') {
+        collection.find({name: new RegExp(req.body.productname, 'i')}, function(err, prod){
+                if (err) throw err;
+                console.log("product");
+                console.log(prod);
+                res.render('product/index', {products: prod});
+        });
+    }
+    else if(req.body.productname == '' && req.body.sel1 != 'All Categories') {
+            collection.find({category: req.body.sel1}, function(err, prod){
+                if (err) throw err;
+                console.log("product");
+                console.log(prod);
+                res.render('product/index', {products: prod});
+        });
+    
+    }
+    else {
+            collection.find({name: new RegExp(req.body.productname, 'i'),category: req.body.sel1}, function(err, prod){
                 if (err) throw err;
                 console.log("product");
                 console.log(prod);
@@ -101,8 +118,10 @@ router.post('/search', function(req,res,next) {
     }
 });
 
+
+
 function isLoggedIn(req, res, next) {
-    if (req.user) {
+    if (req.isAuthenticated()) {
         return next();
     }
     else{
