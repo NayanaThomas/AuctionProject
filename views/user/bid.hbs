@@ -8,25 +8,30 @@
     </thead>
     <tr>
         <!-- <th scope="row">1</th> -->
-        <td class="thumbnail"><img src="{{products.image}}" alt="Product image" class="img-responsive thumbnail"></td>
-        <td>
+        <!--<td class="thumbnail"><img src="{{products.image}}" alt="Product image" class="img-responsive thumbnail"></td>
+        <td>-->
         <td>
             <ul class="list-unstyled">
-                <li class="font-weight-bold">{{ products.name }}</li>
-                <li>Category: {{ products.category }}</li>
-                <li>Description: {{ products.description }}</li>
-                <li>Timer: {{ products.timer }}</li>
+                <li class="font-weight-bold">{{ products.prod_id }}</li>          
                 <li>Minimum Bid: {{ products.amount }}</li>
-                <li>Seller: {{ products.seller }}</li>
-                <!-- <li>Buyer: {{products.buyer}} </li> -->
+                
+                
+
                 
 
             </ul>
         </td>
         <td>
-            <form action="/favourites/{{this._id}}" method="post">
+            <form action="/user/product/{{products._id}}" method="post">
+                <label for="amount">Amount:</label>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <input type="number" name="amount" id="amount">
+                <button id="bid" type="submit" class="btn btn-primary">submit</button>
+            </form>
+            <form action="/favourites/{{products._id}}" method="post">
                 <button id="fav" type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i></button>
             </form>
         </td>
     </tr>
 </table>
+

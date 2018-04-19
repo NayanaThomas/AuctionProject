@@ -8,7 +8,13 @@ var csrfProtection = csrf();
 router.use(csrfProtection);
 var url = require('url');
 
+
 var db = monk('localhost:27017/auction');
+var prodCollection = db.get('products');
+
+var favCollection = db.get('favourites');
+var bidCollection = db.get('bids');
+var userCollection = db.get('users');
 router.use(bodyParser.urlencoded({ extended: true }));
 
 // defining the route
@@ -16,14 +22,45 @@ router.get('/profile', isLoggedIn, function(req, res, next){
 	res.render('user/profile');
 });
 
-router.get('/bid/:id', function (req, res) {
-    var prodCollection = db.get('products');
-    prodCollection.findOne({ _id: req.params.id }, function (err, products) {
+router.get('/product/:id',isLoggedIn, function (req, res, next) {
+    
+    console.log("bid");
+    console.log(req.params.id);
+    prodCollection.findOne({ _id: req.params.id }, function (err, biditem) {
         if (err) console.log(err);
-        res.render('user/bid', { products: products});
+        console.log(biditem);
+        res.render('user/bid', { products: biditem, csrfToken: req.csrfToken() });
     });
     
 });
+
+
+router.post('/product/:id', isLoggedIn, function (req, res, next) {
+    console.log("bid post");
+    console.log(req.params.id);
+    console.log(req.body.amount);
+
+    prodCollection.findOne({ _id: req.params.id }, function (err, biditem1) {
+        if (err) {
+            console.log(err);
+        }
+        console.log(biditem1);
+ 		if (biditem1.amount < req.body.amount) {
+            prodCollection.update({ _id: req.params.id }, {
+                $set: {
+                    amount: req.body.amount,
+                    buyer: req.session.passport.user
+                }
+            }, function (err, result) {
+                if (err) console.log(err);
+                console.log(result);
+
+            });
+        }
+        res.render('user/bid', { products: biditem1, csrfToken: req.csrfToken() });
+    });
+});
+
 
 router.get('/favourites_page',  isLoggedIn, function(req, res, next) {
 	var userCollection = db.get('users');

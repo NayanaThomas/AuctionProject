@@ -9,7 +9,8 @@ var schema = new Schema({
     amount: { type: Number, required: true },
     image: { type: String, required: true },
     seller: { type: String, required: true },
-    user: { type: String, required: true }
+    user: { type: String, required: true },
+    delete_flag: {type: Boolean, required: true}
 });
 
 module.exports = mongoose.model('Favourite', schema);

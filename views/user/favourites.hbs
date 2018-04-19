@@ -22,7 +22,11 @@
                 <!-- <li>Buyer: {{this.buyer}} </li> -->
             </ul>
         </td>
+        <td>
+            <form action="/unfavourite/{{this._id}}" method="post">
+                <button id="fav" type="submit" class="btn btn-primary"><i class="fas fa-times-square"></i></button>
+            </form>
+        </td>
     </tr>
-
     {{/each}}
 </table>
