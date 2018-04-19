@@ -1,11 +1,6 @@
-<h1>bid</h1>
+<h3>Submit your bid amount here</h3>
+<br />
 <table class="table table-hover">
-    <thead>
-        <tr>
-            <th scope="col">image</th>
-            <th scope="col">details</th>
-        </tr>
-    </thead>
     <tr>
         <!-- <th scope="row">1</th> -->
         <!--<td class="thumbnail"><img src="{{products.image}}" alt="Product image" class="img-responsive thumbnail"></td>
@@ -27,9 +22,6 @@
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                 <input type="number" name="amount" id="amount">
                 <button id="bid" type="submit" class="btn btn-primary">submit</button>
-            </form>
-            <form action="/favourites/{{products._id}}" method="post">
-                <button id="fav" type="submit" class="btn btn-primary"><i class="fas fa-check-circle"></i></button>
             </form>
         </td>
     </tr>

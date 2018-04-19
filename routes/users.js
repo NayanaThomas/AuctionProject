@@ -45,7 +45,13 @@ router.post('/product/:id', isLoggedIn, function (req, res, next) {
             console.log(err);
         }
         console.log(biditem1);
- 		if (biditem1.amount < req.body.amount) {
+        console.log("compare values");
+        console.log("biditem1.amount", biditem1.amount);
+        console.log("req.body.amount", req.body.amount);
+ 		console.log(parseInt(biditem1.amount) < parseInt(req.body.amount));
+ 		if (parseInt(biditem1.amount) < parseInt(req.body.amount)) {
+ 			console.log("compare values");
+ 			console.log(biditem1.amount < req.body.amount);
             prodCollection.update({ _id: req.params.id }, {
                 $set: {
                     amount: req.body.amount,
@@ -57,7 +63,8 @@ router.post('/product/:id', isLoggedIn, function (req, res, next) {
 
             });
         }
-        res.render('user/bid', { products: biditem1, csrfToken: req.csrfToken() });
+        res.redirect('/');
+        //res.render('user/bid', { products: biditem1, csrfToken: req.csrfToken() });
     });
 });
 
