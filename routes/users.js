@@ -17,21 +17,101 @@ var bidCollection = db.get('bids');
 var userCollection = db.get('users');
 router.use(bodyParser.urlencoded({ extended: true }));
 
+
+router.get('/home', function(req, res, next) {
+	var collection = db.get('products');
+	userCollection.findOne({ _id: req.session.passport.user,  }, 'email', function (err, result) {
+			if (err) {
+					console.log(err);
+			}
+			console.log(req.session.passport.user);
+			console.log("result:", result);
+			console.log("result.email",result.email);
+			if (result.email === "auction.admin@auction.com") {
+				collection.find({},function(err, products){
+						if (err) {
+							console.log(err);
+						}
+						//console.log(products);
+						res.render('product/index', {products: products});
+			});
+			}
+			else {
+					collection.find({ delete_flag: false,	seller: { $ne: result.email } },function(err, products){
+							if (err) {
+								console.log(err);
+							}
+							//console.log(products);
+							res.render('product/index', {products: products});
+				});
+			}
+	});
+});
+
 // defining the route
 router.get('/profile', isLoggedIn, function(req, res, next){
 	res.render('user/profile');
 });
+function calculateTime(time_value) {
+  var d = new Date();
+  var m = d.getMinutes();
+  var h = d.getHours();
+  if(h == '0') {h = 24}
 
+  var currentHour=h;
+  var currentMin=m;
+
+
+  // get input time
+  var element = time_value;
+  var time = element.split(":");
+  var hour = time[0];
+  if(hour == '00') {hour = 24}
+  var min = time[1];
+
+  var inputHour = hour;
+  var inputMin = min;
+
+  var totalHour = inputHour-currentHour;
+  var totalMin = inputMin-currentMin;
+  if (totalHour > 0)
+  {
+	  return 1;
+  }
+  else if(totalHour==0 && totalMin>0)
+  {
+	  return 1;
+  }
+  else
+  {
+	  return 0;
+  }
+
+}
 router.get('/product/:id',isLoggedIn, function (req, res, next) {
-    
+
     console.log("bid");
     console.log(req.params.id);
     prodCollection.findOne({ _id: req.params.id }, function (err, biditem) {
         if (err) console.log(err);
         console.log(biditem);
+		  // get system local time
+
+
+
+    if(calculateTime(biditem.timer)==1)
+    {
+
         res.render('user/bid', { products: biditem, csrfToken: req.csrfToken() });
+
+	}
+
+  else
+   {
+	    res.render('user/finish');
+   }
     });
-    
+
 });
 
 
@@ -49,6 +129,8 @@ router.post('/product/:id', isLoggedIn, function (req, res, next) {
         console.log("biditem1.amount", biditem1.amount);
         console.log("req.body.amount", req.body.amount);
  		console.log(parseInt(biditem1.amount) < parseInt(req.body.amount));
+		if(calculateTime(biditem1.timer)==1)
+		{
  		if (parseInt(biditem1.amount) < parseInt(req.body.amount)) {
  			console.log("compare values");
  			console.log(biditem1.amount < req.body.amount);
@@ -63,8 +145,14 @@ router.post('/product/:id', isLoggedIn, function (req, res, next) {
 
             });
         }
-        res.redirect('/');
+        res.redirect('/user/home');
         //res.render('user/bid', { products: biditem1, csrfToken: req.csrfToken() });
+		}
+		else
+		{
+			res.render('user/finish');
+		}
+
     });
 });
 
@@ -77,13 +165,13 @@ router.get('/favourites_page',  isLoggedIn, function(req, res, next) {
             console.log(err);
         }
         console.log(result.email);
-        favCollection.find({ user: result.email }, function (err, products) {
+        favCollection.find({ user: result.email, delete_flag: false, fav_flag: true }, function (err, products) {
             if (err) console.log(err);
             console.log('fav page');
             console.log(products);
-            res.render('user/favourites', { products: products });
+            res.render('user/favourites', { products: products});
         });
-        
+
     });
 });
 
@@ -97,7 +185,7 @@ usercollection.findOne({_id: req.session.passport.user}, 'email', function(err, 
 		console.log(err);
 	}
 	console.log(result.email);
-	collection.find({seller: result.email }, function(err, prod){
+	collection.find({seller: result.email, delete_flag: false }, function(err, prod){
 				if (err) throw err;
 				console.log("product");
 				console.log(prod);
@@ -132,7 +220,7 @@ router.get('/signin', function(req, res, next) {
 
 });
 router.post('/signin', passport.authenticate('local.signin', {
-	successRedirect: '/',
+	successRedirect: '/user/home',
 	failureRedirect: '/user/signin',
 	failureFlash: true
 }));
@@ -144,7 +232,7 @@ function isLoggedIn(req, res, next) {
 	else{
 		res.redirect('/');
 	}
-	
+
 }
 
 function isnotLoggedIn(req, res, next) {
@@ -156,4 +244,3 @@ function isnotLoggedIn(req, res, next) {
 
 
 module.exports = router;
-

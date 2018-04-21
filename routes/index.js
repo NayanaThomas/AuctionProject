@@ -33,29 +33,24 @@ var favCollection = db.get('favourites');
 //})
 
 
-
 router.get('/', function(req, res, next) {
-	var collection = db.get('products');
-	collection.find({},function(err, products){
-			if (err) {
-				console.log(err);
-			}
-			//console.log(products);
-			res.render('product/index', {products: products});
-		});
-
+	res.render('layouts/main');
 });
 
+
+
+
+
 router.post('/favourites/:id',  isLoggedIn, function(req, res){
-	
+
 	var id = req.params.id;
 	console.log(id);
 	console.log("fav");
-	prodCollection.findOne({ _id: id }, function(err, products){
+	prodCollection.findOne({ _id: id, delete_flag: false }, function(err, products){
 			if (err) {
                 console.log(err);
                 throw err;
-			}           
+			}
             userCollection.findOne({ _id: req.session.passport.user }, 'email', function (err, result) {
                 if (err) {
                     console.log(err);
@@ -70,9 +65,11 @@ router.post('/favourites/:id',  isLoggedIn, function(req, res){
                     amount: products.amount,
                     image: products.image,
                     seller: products.seller,
-                    user: result.email
+                    user: result.email,
+					delete_flag: products.delete_flag,
+					fav_flag: true
                 });
-                
+				console.log("favourite", favourite);
                 favCollection.findOne({
                     prod_id: id,
                     user: result.email
@@ -82,14 +79,27 @@ router.post('/favourites/:id',  isLoggedIn, function(req, res){
                     if (resul === null) {
                         favourite.save(function (err) {
                             if (err) console.log(err);
+														console.log(resul);
                            // res.render('/');
-                        });
+                        })
+
                         //res.render('/');
-                    };
-                    //res.render('/');  
+                    }
+                    else {
+                        favCollection.update( { prod_id: id },
+                        {
+                            $set: { fav_flag: true }
+                        },
+                        function (err) {
+                            if (err) console.log(err);
+                            console.log(result);
+
+                        });
+                    }
+                    //res.render('/');
                 });
             });
-            res.redirect('/');
+            res.redirect('/user/home');
 	});
 });
 
@@ -98,19 +108,22 @@ router.post('/unfavourite/:id', isLoggedIn, function (req, res, next) {
     var id = req.params.id;
     console.log(id);
     console.log("unfav");
-    favCollection.remove({ _id: id }, function (err) {
+    favCollection.update({ _id: id },
+			{  $set: { fav_flag: false }
+			}, function (err) {
         if (err) console.log(err);
         userCollection.findOne({ _id: req.session.passport.user }, 'email', function (err, result) {
             if (err) {
                 console.log(err);
             }
-            favCollection.find({ user: result.email }, function (err, products) {
+            favCollection.find({ user: result.email, delete_flag: false, fav_flag:true }, function (err, products) {
                 if (err) console.log(err);
-                res.render('user/favourites', { products: products });
+
+                res.render('user/favourites', { products: products  });
             });
-           
+
         });
-        
+
     });
 });
 
@@ -135,4 +148,3 @@ function isnotLoggedIn(req, res, next) {
 
 
 module.exports = router;
-  
