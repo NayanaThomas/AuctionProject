@@ -16,11 +16,12 @@ var favCollection = db.get('favourites');
 var bidCollection = db.get('bids');
 var userCollection = db.get('users');
 router.use(bodyParser.urlencoded({ extended: true }));
-
+var totalPosts = 0;
 
 router.get('/home', function(req, res, next) {
 	var collection = db.get('products');
-	userCollection.findOne({ _id: req.session.passport.user,  }, 'email', function (err, result) {
+
+	userCollection.findOne({ _id: req.session.passport.user}, 'email', function (err, result) {
 			if (err) {
 					console.log(err);
 			}
@@ -34,16 +35,70 @@ router.get('/home', function(req, res, next) {
 						}
 						//console.log(products);
 						res.render('product/index', {products: products});
-			});
+				});
 			}
 			else {
-					collection.find({ delete_flag: false,	seller: { $ne: result.email } },function(err, products){
-							if (err) {
-								console.log(err);
-							}
-							//console.log(products);
-							res.render('product/index', {products: products});
+				collection.find({ delete_flag: false,	seller: { $ne: result.email }},function(err, products){
+					if (err) {
+						console.log(err);
+					}
+					console.log("collection count: ",products.length);
+					totalPosts =products.length;
 				});
+				var currentPage = 1;
+				var pLimit = 3; 
+				var totalPages = totalPosts / pLimit;
+				collection.find({ delete_flag: false,	seller: { $ne: result.email }}, {sort : { name : 1 } ,limit : pLimit, skip: (currentPage-1)*pLimit },function(err, products){
+					if (err) {
+							console.log(err);
+						}
+						console.log(products);
+						res.render('product/index', {products: products, pages: totalPages, currentPage: currentPage, nextPage: (currentPage+1),  prevPage: (currentPage-1)});
+				});
+				//res.render('product/index', {products: products});
+			}
+	});
+});
+
+router.get('/home/:page', function(req, res, next) {
+	console.log(req.params.page);
+	var collection = db.get('products');
+
+	userCollection.findOne({ _id: req.session.passport.user}, 'email', function (err, result) {
+			if (err) {
+					console.log(err);
+			}
+			console.log(req.session.passport.user);
+			console.log("result:", result);
+			console.log("result.email",result.email);
+			if (result.email === "auction.admin@auction.com") {
+				collection.find({},function(err, products){
+						if (err) {
+							console.log(err);
+						}
+						//console.log(products);
+						res.render('product/index', {products: products});
+				});
+			}
+			else {
+				var currentPage = parseInt(req.params.page);
+				if(currentPage <= 0) {
+					currentPage = 1;
+				}
+				var pLimit = 3;
+				var totalPages = Math.ceil(totalPosts / pLimit);
+				if(currentPage > totalPages) {
+					currentPage = totalPages;
+				}
+				collection.find({ delete_flag: false,	seller: { $ne: result.email }}, {sort : { name : 1 } ,limit : pLimit, skip: (currentPage-1)*pLimit },function(err, products){
+					if (err) {
+							console.log(err);
+						}
+						console.log(products);
+						res.render('product/index', {products: products, pages: totalPages, currentPage: currentPage, nextPage: (currentPage+1),  prevPage: (currentPage-1)});
+				});
+				//res.render('product/index', {products: products});
+				
 			}
 	});
 });

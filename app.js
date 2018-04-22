@@ -13,6 +13,7 @@ var flash = require('connect-flash');
 var validator = require('express-validator');
 var MongoStore = require('connect-mongo')(session);
 var multer = require('multer');
+var helpers = require('handlebars-helpers')();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -27,6 +28,13 @@ require('./config/passport');
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
 app.set('view engine', '.hbs');
+
+var Handlebars = require('handlebars');
+
+Handlebars.registerHelper("inc", function(value, options)
+{
+    return parseInt(value) + 1;
+});
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -73,6 +81,28 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.get('/posts', function (req, res, next) {
+  res.render('/product/index', {
+      paginator: {
+          limit: 10, // This key:value pair is required.
+          defaultPage: 'posts', // This key:value pair defaults to 'posts' if not set.
+          currentPage: req.params.page, // This key:value pair is required.
+          totalPages: 20, // This key:value pair is required.
+      }
+  });
+});
+
+app.get('/posts/:page', function(req, res, next) {
+  res.render('/product/index', {
+      paginator: {
+          limit: 10, // This key:value pair is required.
+          defaultPage: 'posts', // This key:value pair defaults to 'posts' if not set.
+          currentPage: req.params.page, // This key:value pair is required.
+          totalPages: 20, // This key:value pair is required.
+      }
+  });
 });
 
 module.exports = app;

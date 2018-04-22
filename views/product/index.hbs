@@ -24,6 +24,7 @@
             <th scope="col">Details</th>
         </tr>
     </thead>
+
     {{# each products }}
     <tr>
         <td class="thumbnail"><img src="{{this.image}}" alt="Product image" class="img-responsive thumbnail"></td>
@@ -50,3 +51,36 @@
     </tr>
     {{/each}}
 </table>
+
+
+<nav aria-label="...">
+  <ul class="pagination">
+    <li class="page-item">
+    {{#if (eq currentPage 1)}}
+    <li class="page-item disabled">
+    {{/if}}
+      <a class="page-link" href="/user/home/{{prevPage}}" tabindex="-1">Previous</a>
+    </li>
+
+    <li class="page-item">
+    {{#if (eq  currentPage 1)}}
+    <li class="page-item active">
+    {{/if}}
+    <a class="page-link" href="/user/home">1</a></li>
+     
+    <li class="page-item">
+    {{#if (eq currentPage 2)}}
+    <li class="page-item active">
+    {{/if}}
+    <a class="page-link" href="/user/home/2">2 <span class="sr-only">(current)</span></a>
+    </li>
+
+    <li class="page-item">
+    {{#if (eq currentPage pages)}}
+    <li class="page-item disabled">
+    {{/if}}
+      <a class="page-link" href="/user/home/{{nextPage}}">Next</a>
+    </li>
+  </ul>
+</nav>
+
