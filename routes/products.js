@@ -92,7 +92,7 @@ router.post('/add', multer(multerConf).single('image'),function(req, res, next) 
             //     }
             //     console.log(resu);
             // });
-            res.redirect('/user/home');
+            res.redirect('/user/userAuctionItems');
         });
     });
 });
@@ -128,6 +128,26 @@ router.post('/delete/:id', isLoggedIn, function(req, res, next){
 	});
 });
 
+router.post('/admin/delete/:id', isLoggedIn, function(req, res, next){
+    var prodCollection = db.get('products');
+    prodCollection.update( { _id: req.params.id },
+        {
+          $set: { delete_flag: true }
+        },
+        function (err) {
+            if (err) console.log(err);
+            var favCollection = db.get('favourites');
+            favCollection.update( { prod_id: req.params.id },
+                {
+                $set: { delete_flag: true }
+                }, function(err){
+                if(err) console.log(err);
+                res.redirect('/user/home');
+                    
+                
+        });
+    });
+});
 
 
 router.post('/search', isLoggedIn, function (req, res, next) {
@@ -170,7 +190,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
             console.log("result:", result);
             console.log("result.email",result.email);
             if (result.email === "auction.admin@auction.com") {
-                collection.find({delete_flag: false},function(err, products) {
+                collection.find({delete_flag: false, name: new RegExp(req.body.productname, 'i')},function(err, products) {
                     if (err) {
                         console.log(err);
                     }
@@ -198,7 +218,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
             console.log("result:", result);
             console.log("result.email",result.email);
             if (result.email === "auction.admin@auction.com") {
-                collection.find({ delete_flag: false},function(err, products){
+                collection.find({ delete_flag: false, category: req.body.sel1, name: new RegExp(req.body.productname, 'i')},function(err, products){
                     if (err) {
                         console.log(err);
                     }
@@ -226,7 +246,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
             console.log("result:", result);
             console.log("result.email",result.email);
             if (result.email === "auction.admin@auction.com") {
-                collection.find({ delete_flag: false},function(err, products){
+                collection.find({ delete_flag: false, name: new RegExp(req.body.productname, 'i'), category: req.body.sel1},function(err, products){
                     if (err) {
                         console.log(err);
                     }

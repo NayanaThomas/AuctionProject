@@ -1,5 +1,5 @@
 <br />
-<form class="form-inline" action="/product/favourites/search" method="post">
+<form class="form-inline float-right" action="/product/favourites/search" method="post">
     <input class="form-control mr-sm-2" id="productname" name="productname" type="search" placeholder="Product Name" aria-label="Search">
     <div class="form-group">
         <select class="form-control" id="sel1" name="sel1" placeholder="Categories">
@@ -22,6 +22,10 @@
         <tr>
             <th scope="col">Product</th>
             <th scope="col">Details</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+
+
         </tr>
     </thead>
     {{# each products }}
@@ -35,19 +39,23 @@
                 <li class="font-weight-bold">{{ this.name }}</li>
                 <li>Category: {{ this.category }}</li>
                 <li>Description: {{ this.description }}</li>
-                <li>Timer: {{ this.timer }}</li>
+                <li>Time: {{ this.timer }}</li>
+				<li>End date: {{ this.date }}</li>
                 <li>Minimum Bid: {{ this.amount }}</li>
                 <!-- <li>Seller: {{ this.seller }}</li> -->
                 <!-- <li>Buyer: {{this.buyer}} </li> -->
             </ul>
         </td>
         <td>
-            <form action="/unfavourite/{{this._id}}" method="post">
-                <button id="fav" type="submit" class="btn btn-primary"><i class="fas fa-times-square"></i></button>
-            </form>
+
             <form action="/user/product/{{this.prod_id}}" method="get">
                 <button id="bid" type="submit" style="margin-bottom: 0.5em" class="btn btn-primary">Bid</button>
             </form>
+
+            <form action="/unfavourite/{{this._id}}" method="post">
+                <button id="fav" type="submit" class="btn btn-primary"><i class="fas fa-times"></i></button>
+            </form>
+
         </td>
     </tr>
     {{/each}}

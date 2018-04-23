@@ -17,7 +17,60 @@ var bidCollection = db.get('bids');
 var userCollection = db.get('users');
 router.use(bodyParser.urlencoded({ extended: true }));
 var totalPosts = 0;
+var totaladminPosts = 0;
+function calculateTime(time_value,input_date) 
+{
+  var d = new Date();
+  var m = d.getMinutes();
+  var h = d.getHours();
 
+  var currentHour=h;
+  var currentMin=m;
+	var today_date = d;
+	today_date.setHours(0,0,0,0);
+    input_date.setHours(0,0,0,0);
+	  // get input time
+  var element = time_value;
+  var time = element.split(":");
+  var hour = time[0];
+  var min = time[1];
+
+  var inputHour = hour;
+  var inputMin = min;
+
+  var totalHour = inputHour-currentHour;
+  var totalMin = inputMin-currentMin;
+  console.log(today_date);
+  console.log(input_date);
+    if(input_date.toDateString()>today_date.toDateString())
+   {
+       return 1;
+    }
+	else if(input_date.toDateString()==today_date.toDateString())
+	{
+		  if (totalHour > 0)
+           {
+	  
+	          return 1;
+           }
+          else if(totalHour==0 && totalMin>0)
+          {
+	 
+	         return 1;
+          }
+          else
+          {
+	
+	       return 0;
+           }
+		   
+     }
+	else
+	{
+		return 0;
+	}
+
+}
 router.get('/home', function(req, res, next) {
 	var collection = db.get('products');
 
@@ -29,25 +82,36 @@ router.get('/home', function(req, res, next) {
 			console.log("result:", result);
 			console.log("result.email",result.email);
 			if (result.email === "auction.admin@auction.com") {
-				collection.find({},function(err, products){
+				collection.find({delete_flag: false},function(err, products){
+						console.log("inside admin");
 						if (err) {
 							console.log(err);
 						}
 						//console.log(products);
-						res.render('product/index', {products: products});
+						totaladminPosts =products.length;
+						var admincurrentPage = 1;
+						var adminpLimit = 3; 
+						var admintotalPages = Math.ceil(totaladminPosts / adminpLimit);
+						collection.find({delete_flag: false},{sort : { name : 1 } ,limit : adminpLimit, skip: (admincurrentPage-1)*adminpLimit},function(err, products){
+							if (err) {
+								console.log(err);
+							}
+							console.log(currentPage);
+							res.render('product/admin', {products: products, pages: admintotalPages, currentPage: admincurrentPage, nextPage: (admincurrentPage+1),  prevPage: (admincurrentPage-1)});
+						});
 				});
 			}
 			else {
 				collection.find({ delete_flag: false,	seller: { $ne: result.email }},function(err, products){
 					if (err) {
-						console.log(err);
+						console.log(err);	
 					}
 					console.log("collection count: ",products.length);
 					totalPosts =products.length;
 				});
 				var currentPage = 1;
 				var pLimit = 3; 
-				var totalPages = totalPosts / pLimit;
+				var totalPages = Math.ceil(totalPosts / pLimit);
 				collection.find({ delete_flag: false,	seller: { $ne: result.email }}, {sort : { name : 1 } ,limit : pLimit, skip: (currentPage-1)*pLimit },function(err, products){
 					if (err) {
 							console.log(err);
@@ -72,12 +136,20 @@ router.get('/home/:page', function(req, res, next) {
 			console.log("result:", result);
 			console.log("result.email",result.email);
 			if (result.email === "auction.admin@auction.com") {
-				collection.find({},function(err, products){
+				collection.find({delete_flag: false},function(err, products){
 						if (err) {
 							console.log(err);
 						}
-						//console.log(products);
-						res.render('product/index', {products: products});
+						totaladminPosts =products.length;
+						var admincurrentPage = parseInt(req.params.page);;
+						var adminpLimit = 3; 
+						var admintotalPages = Math.ceil(totaladminPosts / adminpLimit);
+						collection.find({delete_flag: false},{sort : { name : 1 } ,limit : adminpLimit, skip: (admincurrentPage-1)*adminpLimit},function(err, products){
+							if (err) {
+								console.log(err);
+							}
+							res.render('product/admin', {products: products, pages: admintotalPages, currentPage: admincurrentPage, nextPage: (admincurrentPage+1),  prevPage: (admincurrentPage-1)});
+						});
 				});
 			}
 			else {
@@ -105,44 +177,42 @@ router.get('/home/:page', function(req, res, next) {
 
 // defining the route
 router.get('/profile', isLoggedIn, function(req, res, next){
-	res.render('user/profile');
+var collection2 = db.get('products');
+	var res_prod2=[];
+	collection2.find({ buyer: req.session.passport.user },function(err, products2){
+			    if (err) {
+								console.log(err);
+							}
+							//console.log(products2);
+					for (var key in products2)
+					{
+						
+						if(calculateTime(products2[key].timer,products2[key].date)==0)
+						{
+							
+							res_prod2[key]=products2[key];
+						
+						}
+					}
+					console.log(res_prod2);
+					if (res_prod2.length==0)
+					{
+						res.render('user/nowin');
+					}
+					else
+					{
+						
+					        
+					     res.render('user/profile', {products: res_prod2});
+							
+					}
+					
+					
+					
+							
+				});	
 });
-function calculateTime(time_value) {
-  var d = new Date();
-  var m = d.getMinutes();
-  var h = d.getHours();
-  if(h == '0') {h = 24}
 
-  var currentHour=h;
-  var currentMin=m;
-
-
-  // get input time
-  var element = time_value;
-  var time = element.split(":");
-  var hour = time[0];
-  if(hour == '00') {hour = 24}
-  var min = time[1];
-
-  var inputHour = hour;
-  var inputMin = min;
-
-  var totalHour = inputHour-currentHour;
-  var totalMin = inputMin-currentMin;
-  if (totalHour > 0)
-  {
-	  return 1;
-  }
-  else if(totalHour==0 && totalMin>0)
-  {
-	  return 1;
-  }
-  else
-  {
-	  return 0;
-  }
-
-}
 router.get('/product/:id',isLoggedIn, function (req, res, next) {
 
     console.log("bid");
@@ -154,7 +224,7 @@ router.get('/product/:id',isLoggedIn, function (req, res, next) {
 
 
 
-    if(calculateTime(biditem.timer)==1)
+    if(calculateTime(biditem.timer,biditem.date)==1)
     {
 
         res.render('user/bid', { products: biditem, csrfToken: req.csrfToken() });
@@ -184,7 +254,7 @@ router.post('/product/:id', isLoggedIn, function (req, res, next) {
         console.log("biditem1.amount", biditem1.amount);
         console.log("req.body.amount", req.body.amount);
  		console.log(parseInt(biditem1.amount) < parseInt(req.body.amount));
-		if(calculateTime(biditem1.timer)==1)
+		if(calculateTime(biditem1.timer,biditem1.date)==1)
 		{
  		if (parseInt(biditem1.amount) < parseInt(req.body.amount)) {
  			console.log("compare values");
@@ -264,7 +334,7 @@ router.get('/signup', function(req, res, next) {
 });
 
 router.post('/signup', passport.authenticate('local.signup', {
-	successRedirect: '/user/profile',
+	successRedirect: '/user/home',
 	failureRedirect: '/user/signup',
 	failureFlash: true
 }));

@@ -62,6 +62,7 @@ router.post('/favourites/:id',  isLoggedIn, function(req, res){
                     description: products.description,
                     category: products.category,
                     timer: products.timer,
+					date: products.date,
                     amount: products.amount,
                     image: products.image,
                     seller: products.seller,

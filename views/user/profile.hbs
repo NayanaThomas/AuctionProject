@@ -1,2 +1,26 @@
 <br />
 <h2>Your won bids</h2>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Image</th>
+            <th scope="col">Details</th>
+        </tr>
+    </thead>
+    {{# each products }}
+    <tr>
+        <td class="thumbnail"><img src="{{this.image}}" alt="Product image" class="img-responsive thumbnail"></td>
+        <td>
+            <ul class="list-unstyled">
+                <li class="font-weight-bold">{{ this.name }}</li>
+                <li>Category: {{ this.category }}</li>
+                <li>Description: {{ this.description }}</li>
+                <li>Winning Bid: {{ this.amount }}</li>
+                <li>Seller: {{ this.seller }}</li>
+            </ul>
+        </td>
+    </tr>
+    {{/each}}
+</table>
+
