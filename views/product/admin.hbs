@@ -36,7 +36,7 @@
                 <li>Description: {{ this.description }}</li>
                 <li>Time: {{ this.timer }}</li>
 				<li>End Date: {{ this.date }}</li>
-                <li>Minimum Bid: {{ this.amount }}</li>
+                <li>Bid: {{ this.amount }}</li>
                 <li>Seller: {{ this.seller }}</li>
                 <!-- <li>Buyer: {{this.buyer}} </li> -->
             </ul>
@@ -52,7 +52,7 @@
     {{/each}}
 </table>
 
-
+{{#if (eq pageinationBar 1)}}
 <div id="pagination" >
 <nav aria-label="...">
   <ul class="pagination justify-content-center">
@@ -85,3 +85,4 @@
   </ul>
 </nav>
 </div>
+{{/if}}

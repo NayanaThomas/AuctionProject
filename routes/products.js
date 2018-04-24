@@ -11,6 +11,7 @@ var multer = require('multer');
 var url = 'mongodb://localhost:27017/auction';
 mongoose.connect('mongodb://localhost:27017/auction');
 
+
 var multerConf = {
     storage : multer.diskStorage({
     destination: function(req, file, next) {
@@ -49,7 +50,8 @@ var db = monk('localhost:27017/auction');
 var userCollection = db.get('users');
 
 router.get('/createproduct', isLoggedIn, function(req, res, next) {
-	res.render('product/createproduct');
+	var message=" ";
+	res.render('product/createproduct',{message: message});
 });
 
 router.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -60,6 +62,14 @@ router.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 
 router.post('/add', multer(multerConf).single('image'),function(req, res, next) {
+if(req.body.name==""||req.body.description==""||req.body.timer==""||req.body.date==""||req.body.amount=="")
+{
+	var message="One or more input field is missing!!!";
+	
+	res.render('product/createproduct',{message: message});
+}
+else
+{	
     var usercollection = db.get('users');
     console.log("aution");
     console.log(req.session.passport.user);
@@ -77,7 +87,7 @@ router.post('/add', multer(multerConf).single('image'),function(req, res, next) 
                 res.redirect(backURL);
 
              }
-            console.log("inserrted product");
+            console.log("inserted product");
             console.log(result);
             //var fav = db.get('favourites');
             //fav.find
@@ -95,6 +105,7 @@ router.post('/add', multer(multerConf).single('image'),function(req, res, next) 
             res.redirect('/user/userAuctionItems');
         });
     });
+}
 });
 
 router.post('/delete/:id', isLoggedIn, function(req, res, next){
@@ -167,7 +178,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                         //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/admin', {products: products, pageinationBar: 0});
                 });
             }
             else {
@@ -176,7 +187,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                     //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/index', {products: products, pageinationBar: 0});
                 });
             }
         });
@@ -195,7 +206,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                         //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/admin', {products: products, pageinationBar: 0});
                 });
             }
             else {
@@ -204,7 +215,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                     //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/index', {products: products, pageinationBar: 0});
                 });
             }
         });
@@ -223,7 +234,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                         //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/admin', {products: products, pageinationBar: 0});
                 });
             }
             else {
@@ -232,7 +243,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                     //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/index', {products: products, pageinationBar: 0});
                 });
             }
         });
@@ -251,7 +262,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                         //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/admin', {products: products, pageinationBar: 0});
                 });
             }
             else {
@@ -260,7 +271,7 @@ router.post('/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                     //console.log(products);
-                    res.render('product/index', {products: products});
+                    res.render('product/index', {products: products, pageinationBar: 0});
                 });
             }
     });
@@ -314,7 +325,7 @@ router.post('/userauction/search', isLoggedIn, function (req, res, next) {
                         console.log(err);
                     }
                         //console.log(products);
-                    res.render('user/userAuctionItems', {products: products});
+                    res.render('user/userAuctionItems', {products: products, pageinationBar: 0});
                 });
             }
             else {

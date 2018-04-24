@@ -97,7 +97,7 @@ router.get('/home', function(req, res, next) {
 								console.log(err);
 							}
 							console.log(currentPage);
-							res.render('product/admin', {products: products, pages: admintotalPages, currentPage: admincurrentPage, nextPage: (admincurrentPage+1),  prevPage: (admincurrentPage-1)});
+							res.render('product/admin', {products: products, pages: admintotalPages, pageinationBar: 1, currentPage: admincurrentPage, nextPage: (admincurrentPage+1),  prevPage: (admincurrentPage-1)});
 						});
 				});
 			}
@@ -117,7 +117,7 @@ router.get('/home', function(req, res, next) {
 							console.log(err);
 						}
 						console.log(products);
-						res.render('product/index', {products: products, pages: totalPages, currentPage: currentPage, nextPage: (currentPage+1),  prevPage: (currentPage-1)});
+						res.render('product/index', {products: products, pages: totalPages, pageinationBar: 1, currentPage: currentPage, nextPage: (currentPage+1),  prevPage: (currentPage-1)});
 				});
 				//res.render('product/index', {products: products});
 			}
@@ -148,7 +148,7 @@ router.get('/home/:page', function(req, res, next) {
 							if (err) {
 								console.log(err);
 							}
-							res.render('product/admin', {products: products, pages: admintotalPages, currentPage: admincurrentPage, nextPage: (admincurrentPage+1),  prevPage: (admincurrentPage-1)});
+							res.render('product/admin', {products: products, pageinationBar: 1, pages: admintotalPages, currentPage: admincurrentPage, nextPage: (admincurrentPage+1),  prevPage: (admincurrentPage-1)});
 						});
 				});
 			}
@@ -167,7 +167,7 @@ router.get('/home/:page', function(req, res, next) {
 							console.log(err);
 						}
 						console.log(products);
-						res.render('product/index', {products: products, pages: totalPages, currentPage: currentPage, nextPage: (currentPage+1),  prevPage: (currentPage-1)});
+						res.render('product/index', {products: products, pageinationBar: 1, pages: totalPages, currentPage: currentPage, nextPage: (currentPage+1),  prevPage: (currentPage-1)});
 				});
 				//res.render('product/index', {products: products});
 				
